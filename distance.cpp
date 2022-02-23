@@ -1,3 +1,5 @@
+
+
 double distance;
 double detect_bounds;
 double reachable_bounds;
@@ -12,13 +14,17 @@ int right_sensor = 5;
 int LFSensor[3]={0, 0, 0};
 int current_junction_number = 0; //addition or subtraction base on current task, global record 
 int counter_for_break_infinity = 0;
+double K_p;
+
 
 
 void initialize(){
     pinMode(distance_sensor,INPUT);
     pinMode(color_sensor,INPUT);}
 
-void line_following(){}
+void line_following(){
+
+}
 
 void junction_detection(){
     if (LFSensor[0]==1 & LFSensor[1]==1 & LFSensor[2]==1){//junction detected
