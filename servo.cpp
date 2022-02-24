@@ -1,14 +1,5 @@
-/* Sweep
- by BARRAGAN <http://barraganstudio.com>
- This example code is in the public domain.
-
- modified 8 Nov 2013
- by Scott Fitzgerald
- https://www.arduino.cc/en/Tutorial/LibraryExamples/Sweep
-*/
 
 #include <Servo.h>
-
 Servo myservo;  // create servo object to control a servo
 // twelve servo objects can be created on most boards
 
@@ -17,15 +8,31 @@ int pos = 0;    // variable to store the servo position
 void setup() {
   myservo.attach(9);  // attaches the servo on pin 9 to the servo object
 }
+void open_arm(int angle, int angular_velocity, int max_angle){
+    if(angle<max_angle){
+         for (pos = angle; pos <= max_angle; pos += angular_velocity) {
+    myservo.write(pos);            
+    delay(15);                       
+  }
 
+    }
+
+}
+void close_arm(int angle, int angular_velocity){
+  if(angle >=0){
+    for (pos = angle; pos >= 0; pos -= angular_velocity) { 
+    myservo.write(pos);              
+    delay(15);                       
+  }
+    }
+  }
+void object_detection(){
+
+}
 void loop() {
-  for (pos = 0; pos <= 100; pos += 1) { // goes from 0 degrees to 180 degrees
-    // in steps of 1 degree
-    myservo.write(pos);              // tell servo to go to position in variable 'pos'
-    delay(15);                       // waits 15 ms for the servo to reach the position
-  }
-  for (pos = 100; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
-    myservo.write(pos);              // tell servo to go to position in variable 'pos'
-    delay(15);                       // waits 15 ms for the servo to reach the position
-  }
+  open_arm(15,3,90);
+  delay(700);
+  close_arm(90,3);
+  delay(500);
+  
 }

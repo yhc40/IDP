@@ -21,17 +21,20 @@ void setup() {
 
 }
 
-void 
+void move_forward(double s){
+     Motor3->setSpeed(s);
+    Motor3->run(FORWARD);
+    Motor4->setSpeed(s);
+    Motor4->run(FORWARD);
+
+}
  
 
 void loop() {
 
   // put your main code here, to run repeatedly:
 
-  Motor3->setSpeed(150);
-  Motor3->run(FORWARD);
-  Motor4->setSpeed(150);
-  Motor4->run(FORWARD);
+   
 
 
 }
