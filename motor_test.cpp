@@ -20,21 +20,35 @@ void setup() {
   AFMS.begin();
 
 }
-
 void move_forward(double s){
      Motor3->setSpeed(s);
-    Motor3->run(FORWARD);
+    Motor3->run(BACKWARD);
     Motor4->setSpeed(s);
     Motor4->run(FORWARD);
-
 }
+
+void move_backward(double s){
+    Motor3->setSpeed(s);
+    Motor3->run(FORWARD);
+    Motor4->setSpeed(s);
+    Motor4->run(BACKWARD);
+  
+}
+void Brake(){
+  Motor3->setSpeed(0);
+  Motor4->setSpeed(0);
+  delay(3000);
+   }
+
  
 
 void loop() {
-
-  // put your main code here, to run repeatedly:
-
-   
-
+  
+  move_forward(150);
+  delay(1000);
+  move_backward(150);
+  delay(1000);
+  Brake();
+  delay(800);
 
 }
