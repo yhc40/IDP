@@ -7,6 +7,8 @@ int trigPin = 1;
 int echoPin = 2; 
 double max_bound = 30;
 double reachable_bound = 5;
+int task = 0;
+// 0 is going to collection rea, 1 is delivering package, 2 is going back to initial area
 
 long duration; // variable for the duration of sound wave travel
 int distance;
@@ -26,6 +28,7 @@ void sweep(){
     while (distance>=max_bound){
         limit_move++;
     Rotate_right_inplace(100,0);
+    if (limit_move > 200){break;}
     }
     Brake(100);
     while (distance>= reachable_bound){
@@ -35,6 +38,7 @@ void sweep(){
     //color_detection
     //Servo object handling
     //generate new task
+    task = 1
 }
 void Rotate_right_until_match(){
     int limit_move = 0;
@@ -72,7 +76,7 @@ void setup()
 }
 void loop() 
 
-{ while(going_to_collection_area){
+{ while(task == 0){
     Brake(50);
     Distance_sensor();
 
@@ -97,6 +101,16 @@ void loop()
   else if(analogRead(IR1)< threshold && analogRead(IR2)<threshold && analogRead(IR3)<threshold)
   {
     line_recovery()/sweep();
+  }
+  else if(junction_detect){
+      Brake(100);
+      if (correct_distance){
+      //perform specific task
+      //sweep()
+      }
+  }
+  while (task==1){
+      //normal line following 
   }
 
  
