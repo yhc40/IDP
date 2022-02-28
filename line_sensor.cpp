@@ -3,6 +3,39 @@ int IR1=8;
 int IR2=9;
 int IR3 = 10;   
 double threshold = 0.5;
+int trigPin = 1;
+int echoPin = 2; 
+double max_bound = 30;
+double reachable_bound = 5;
+
+long duration; // variable for the duration of sound wave travel
+int distance;
+
+void Distance_sensor(){
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+    duration = pulseIn(echoPin, HIGH);
+  // Calculating the distance
+  distance = duration * 0.034 / 2; // Speed of sound wave divided by 2 (go and back)
+}
+void sweep(){
+    int limit_move = 0;
+    while (distance>=max_bound){
+        limit_move++;
+    Rotate_right_inplace(100,0);
+    }
+    Brake(100);
+    while (distance>= reachable_bound){
+        move_forward(100,0);
+    }
+    Brake(100);
+    //color_detection
+    //Servo object handling
+    //generate new task
+}
 void Rotate_right_until_match(){
     int limit_move = 0;
     while (analogRead(IR2)< threshold ){
@@ -29,7 +62,8 @@ void Rotate_left_until_match(){
     Brake(100);
 }
 void setup() 
-{
+{ pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
+  pinMode(echoPin, INPUT); 
   // put your setup code here, to run once:
 
   pinMode(IR1,INPUT);
@@ -40,6 +74,7 @@ void loop()
 
 { while(going_to_collection_area){
     Brake(50);
+    Distance_sensor();
 
    if(analogRead(IR1)< threshold && analogRead(IR2)>=threshold && analogRead(IR3)<threshold) //IR will not glow on black line
   { 

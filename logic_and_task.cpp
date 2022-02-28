@@ -15,7 +15,7 @@ int LFSensor[3]={0, 0, 0};
 int current_junction_number = 0; //addition or subtraction base on current task, global record 
 int counter_for_break_infinity = 0;
 double K_p;
-
+task_generation/object handling->servo movement 
 
 
 void initialize(){
