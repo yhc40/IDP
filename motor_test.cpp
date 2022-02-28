@@ -4,7 +4,7 @@
 
 #include "utility/Adafruit_MS_PWMServoDriver.h"
 
- 
+  
 
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 
@@ -58,6 +58,18 @@ void Rotate_left_inplace(double s, double t){
     Motor4->run(BACKWARD);
     delay(t);
 
+ }
+
+ void Tilt_right(double s, double t){
+     Motor3->setSpeed(s);
+    Motor3->run(BACKWARD);
+    delay(t);
+ }
+
+ void Tilt_left(double s, double t){
+     Motor4->setSpeed(s);
+    Motor4->run(FORWARD);
+    delay(t);
  }
  
 
