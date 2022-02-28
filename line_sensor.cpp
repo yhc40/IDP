@@ -8,6 +8,8 @@ int echoPin = 2;
 double max_bound = 30;
 double reachable_bound = 5;
 int task = 0;
+int load_delivered = 0;
+
 // 0 is going to collection rea, 1 is delivering package, 2 is going back to initial area
 
 long duration; // variable for the duration of sound wave travel
@@ -37,6 +39,7 @@ void sweep(){
     Brake(100);
     //color_detection
     //Servo object handling
+    //line recvoery + move to opposite
     //generate new task
     task = 1
 }
