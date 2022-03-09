@@ -152,7 +152,7 @@ void Rotate_left_inplace(double s, double t){
 
     }
 }
-void line_recoery(){
+void line_recovery(){
     wihle(digitalRead(IR2)==LOW){ 
         move_backward(200,100);
         Brake(200);}
@@ -185,7 +185,7 @@ void sweep(){
         move_forward(100,0);
     }
     Brake(100);
-    //color_detection
+    color_detection();
     //Servo object handling
     //line recvoery + move to opposite
     
@@ -268,14 +268,21 @@ void loop()
   }
 
   else if(digitalRead(IR1) == LOW && digitalRead(IR2) == LOW  && digitalRead(IR3) == LOW)
-  { Rotate_right_until_match();
-    line_recovery();
+  { if(distance >= 10){ Rotate_right_until_match();
+    line_recovery();};
+    if (distance <10){
+        move_forward(300,2500);
+    };
+   
   }
   else if(digitalRead(IR1) == HIGH && digitalRead(IR2) == HIGH  && digitalRead(IR3) == HIGH){
       Brake(100);
-      if (correct_distance){
-      //perform specific task
-      //sweep()
+      if (distance>=85 && distance <=105){
+      
+      sweep();
+      open_arm(0,3,90);
+      close_arm(90,3);
+
       }
   }
   }
