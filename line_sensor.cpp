@@ -168,11 +168,15 @@ void Distance_sensor(){
     duration = pulseIn(echoPin, HIGH);
   // Calculating the distance
   distance = duration * 0.034 / 2; // Speed of sound wave divided by 2 (go and back)
+  Serial.println(distance)
 }
 
 void Rotate_to_opposite_dir(){
+    Rotate_left_inplace(200,1000);
     //None
-}
+} //180 degrees
+
+    
 void sweep(){
     int limit_move = 0;
     while (distance>=max_bound){
