@@ -32,6 +32,9 @@ int task = 0;
 int load_delivered = 0;
 int color_hold = 2;
 
+int blue_led = 12;
+int red_led = 14;
+int color_sensor = 13;
 
 //0 is blue, 1 is red etc
 
@@ -65,6 +68,27 @@ void open_arm(int angle, int angular_velocity, int max_angle){
     }
 
 }
+ void color_detection(){
+    Serial.println(digitalRead(color_sensor));
+    if(digitalRead(color_sensor)==HIGH){
+        color_hold = 1;
+
+        Serial.println("Blue");
+        digitalWrite(blue_led,HIGH);
+        digitalWrite(red_led,LOW);
+        delay(5000);
+        digitalWrite(blue_led,LOW);
+    }
+    else if (digitalRead(color_sensor)==LOW){
+        color_hold = 0;
+        Serial.println("Red");
+        digitalWrite(red_led,HIGH);
+        digitalWrite(blue_led,LOW);
+        delay(5000);
+        digitalWrite(red_led,LOW);
+
+    }
+}
 void Distance_sensor(){
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
@@ -92,8 +116,8 @@ void sweep(){
         move_forward(100,100);
     }
     Brake(100);
-//    color_detection();
-    //Servo object handling
+   color_detection();
+    
     //line recvoery + move to opposite
     
 //    task = 1
@@ -220,6 +244,16 @@ void Rotate_left_until_match(){
     }
     Brake(100);
 }
+void color_path(){
+    if (color_hold==1){
+        Rotate_left_inplace(200,1600);
+        Brake(100);
+    };
+    if (color_hold==0){
+        Rotate_right_inplace(200,1600);
+        Brake(100);
+    };
+}
 void loop() 
 
 { Serial.println("Uploaded");
@@ -294,7 +328,10 @@ else if(digitalRead(IR1) == HIGH && digitalRead(IR2) == HIGH  && digitalRead(IR3
       delay(800);
       close_arm(90,3);
       delay(800);
-       Distance_sensor();}
+       Distance_sensor();
+       Rotate_left_inplace(200,3150);
+       task = 1;
+       }
    else{
     Brake(50);
     move_forward(230,300);
@@ -302,4 +339,73 @@ else if(digitalRead(IR1) == HIGH && digitalRead(IR2) == HIGH  && digitalRead(IR3
    }
       
       
-}}}
+}}
+while(task==1){
+    Distance_sensor();
+  
+    Brake(30);
+    
+
+   if(digitalRead(IR1) == LOW  && digitalRead(IR2)==HIGH && digitalRead(IR3)==LOW) //IR will not glow on black line
+  { 
+    move_forward(230,350);
+   
+    
+  }
+  else if(digitalRead(IR1)== HIGH && digitalRead(IR2)== HIGH && digitalRead(IR3)==LOW)  //IR not on black line
+  {
+    //Move both the Motors
+  
+   Rotate_left_until_match();
+   
+  }
+  else if(digitalRead(IR1) == LOW  && digitalRead(IR2)==HIGH && digitalRead(IR3)==HIGH)
+  {
+    //Tilt robot towards left by stopping the left wheel and moving the right one
+    
+    Rotate_right_until_match();
+    
+  }
+
+  else if(digitalRead(IR1)== HIGH && digitalRead(IR2)== LOW && digitalRead(IR3)==LOW)  //IR not on black line
+  {
+    //Move both the Motors
+    
+   Rotate_left_until_match();
+   
+  }
+
+  else if(digitalRead(IR1) == LOW  && digitalRead(IR2)==LOW && digitalRead(IR3)==HIGH)
+  {
+    //Tilt robot towards left by stopping the left wheel and moving the right one
+    
+    Rotate_right_until_match();
+    
+  }
+
+  else if(digitalRead(IR1) == LOW && digitalRead(IR2) == LOW  && digitalRead(IR3) == LOW)
+  { 
+    move_forward(230,4000);
+  Rotate_left_inplace(200,700);
+  line_recovery();
+    
+}
+else if(digitalRead(IR1) == HIGH && digitalRead(IR2) == HIGH  && digitalRead(IR3) == HIGH){
+  Distance_sensor();
+  if (distance >= 85 & distance <=105){
+      move_backward(200,1500);
+      Brake(300);
+      color_path();
+      move_forward(220,3000);
+
+
+     
+       }
+   else{
+    Brake(50);
+    move_forward(230,300);
+     Distance_sensor();
+   }
+
+
+}}

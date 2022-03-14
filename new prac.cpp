@@ -96,7 +96,7 @@ void setup() {
 
    pinMode(red_led,OUTPUT);
 
-   pinMode(color_sensor,INPUT);
+   pinMode(colour_sensor,INPUT);
 
    myservo.attach(9);
 
@@ -152,45 +152,60 @@ void Brake(double t){
 
    Motor4->setSpeed(0);
 
- 
-
    delay(t);
 
    }
 
  
+void open_arm(int angle, int angular_velocity, int max_angle){
+    if(angle<max_angle){
+         for (pos = angle; pos <= max_angle; pos += angular_velocity) {
+    myservo.write(pos);            
+    delay(15);                       
+  }
 
-void Rotate_right(double s, double t){
-
-    Motor3->setSpeed(s);
-
-    Motor4->setSpeed(s);
-
-    Motor3->run(FORWARD);
-
-   
-
-    Motor4->run(BACKWARD);
-
-    delay(t);
-
+    }
 }
 
- 
+void close_arm(int angle, int angular_velocity){
+  if(angle >=0){
+    for (pos = angle; pos >= 10; pos -= angular_velocity) { 
+    myservo.write(pos);              
+    delay(15);                       
+  }
+    }
+  }
 
-void Rotate_left(double s, double t){
-
+void Rotate_left_inplace(double s, double t){
     Motor3->setSpeed(s);
-
     Motor4->setSpeed(s);
-
     Motor3->run(BACKWARD);
-
     Motor4->run(FORWARD);
-
     delay(t);
 
 }
+
+ void Rotate_right_inplace(double s, double t){
+    Motor3->setSpeed(s);
+    Motor4->setSpeed(s);
+    Motor3->run(FORWARD);
+    
+    Motor4->run(BACKWARD);
+    delay(t);
+
+ }
+
+ void Tilt_right(double s, double t){
+     Motor3->setSpeed(s);
+    Motor3->run(FORWARD);
+    delay(t);
+ }
+
+ void Tilt_left(double s, double t){
+     Motor4->setSpeed(s);
+    Motor4->run(FORWARD);
+    delay(t);
+ }
 
 
 void Rotate_left_until_match(){
@@ -201,7 +216,7 @@ void Rotate_left_until_match(){
 
      limit_move++;
 
-     Rotate_left(100,0);
+     Rotate_left_inplace(100,0);
 
      if (limit_move > 30){break;}
 
@@ -223,7 +238,7 @@ void Rotate_right_until_match(){
 
      limit_move++;
 
-     Rotate_right(100,0);
+     Rotate_right_inplace(100,0);
 
      if (limit_move > 30){break;}
 
@@ -308,14 +323,16 @@ void colour_detection(){
 void sweep(){
 
    int limit_move = 0;
+   Distance_sensor();
 
  
 
    while (distance >= max_bound){
+       Distance_sensor();
 
      limit_move++;
 
-     Rotate_right(100,0);
+     Rotate_right_inplace(100,0);
 
      if (limit_move > 70){
 
@@ -329,9 +346,10 @@ void sweep(){
 
      Brake(300);
 
- 
+ Distance_sensor();
 
    while (distance >= reachable_bound){
+       Distance_sensor();
 
         move_forward(100,0);
 
@@ -343,21 +361,30 @@ void sweep(){
 
      colour_detection();
 
-     open_arm(0,3,90);
+    //  open_arm(0,3,90);
 
-     close_arm(90,3);
+    //  close_arm(90,3);
 
-     task = 1;
+    //  task = 1;
 
-     line_recovery();
+    //  line_recovery();
 
    
 
 }
 
- 
+void color_path(){
+    if (colour_hold==1){
+        Rotate_left_inplace(200,1600);
+        Brake(100);
+    };
+    if (colour_hold==0){
+        Rotate_right_inplace(200,1600);
+        Brake(100);
+    };
+}
 
-void line_follow(task,distance){
+void line_follow(){
 
  
 
@@ -394,7 +421,8 @@ else if(digitalRead(IR1) == LOW  && (digitalRead(IR2)== LOW || digitalRead(IR2)=
 //route recovery
 
 else if(digitalRead(IR1) == LOW && digitalRead(IR2) == LOW  && digitalRead(IR3) == LOW){
-
+    move_forward(230,4000);
+    Rotate_left_inplace(200,700);
    line_recovery();  
 
    }
@@ -404,8 +432,9 @@ else if(digitalRead(IR1) == LOW && digitalRead(IR2) == LOW  && digitalRead(IR3) 
 //junction
 
 else if(digitalRead(IR1) == HIGH && digitalRead(IR2) == HIGH  && digitalRead(IR3) == HIGH){
+    Distance_sensor();
 
-   junction(task, distance)
+   junction();
 
    }
 
@@ -416,11 +445,11 @@ else if(digitalRead(IR1) == HIGH && digitalRead(IR2) == HIGH  && digitalRead(IR3
 
 void line_recovery(){
 
-   Rotate_right_until_match();
+   
 
  
 
-   while(digitalRead(IR2)==LOW){
+   while(digitalRead(IR2)==LOW & digitalRead(IR1)==LOW & digitalRead(IR3)==LOW){
 
      move_backward(200,100);
 
@@ -430,21 +459,43 @@ void line_recovery(){
 
  
 
-void junction (task, distance){
+void junction (){
 
  
 
- if task == 0 {
+ if (task == 0) {
 
-   if (distance >= 85 && distance <= 105):{
+   if (distance >= 30 && distance <= 45)
+   {sweep();
+      open_arm(0,3,90);
+      delay(800);
+      close_arm(90,3);
+      delay(800);
+       Distance_sensor();
+       Rotate_left_inplace(200,3150);
+       task = 1;
+       Distance_sensor();
+     }
+    else{
+    Brake(200);
+    move_forward(220,200);
+    Distance_sensor();
+    }
 
-     detected = 1;
-
-     Break;
+else if (task == 1) {
+    if (distance >= 85 && distance <= 105)
+   {move_backward(200,1500);
+      Brake(300);
+      color_path();
+      move_forward(220,3000);
+      Distance_sensor();
 
      }
-
-if task == 1 {
+    else{
+    Brake(200);
+    move_forward(220,200);
+    Distance_sensor();
+    }
 
  
 
@@ -453,47 +504,11 @@ if task == 1 {
 }
 
  
-
-void colour_path(){
-
-    if (colour_hold==1){
-
-       Rotate_left(200,2000);
-
-       Brake(100);
-
-     };
-
-    if (colour_hold==0){ 
-
-       Rotate_right(200,2000);
-
-       Brake(100);
-
-    };
-
-}
-
- 
-
 void loop() {
 
    Distance_sensor();
 
-   line_follow(task, distance);
+   line_follow();
 
- 
-
-   if detected == 1 {
-
-     sweep();
-
-     open_arm(0,3,90);
-
-     close_arm(90,3);
-
-   }    
-
- 
 
 }
