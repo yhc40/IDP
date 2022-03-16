@@ -28,7 +28,7 @@ int blue_led = 3 ;
 int red_led = 8;
 
 double max_bound = 50;
-double reachable_bound = 30;
+double reachable_bound = 27;
 
 int task = 0;
 int load_delivered = 0;
@@ -135,7 +135,7 @@ void close_arm(int angle, int angular_velocity){
   }
 void move_forward(double s,double t){
      Motor3->setSpeed(s);
-     Motor4->setSpeed(s+10);
+     Motor4->setSpeed(s+16);
     Motor3->run(FORWARD);
     
     Motor4->run(FORWARD);
@@ -204,6 +204,11 @@ void Rotate_left_inplace(double s, double t){
         Brake(100);}
    
 }
+void search_line(){
+  while(digitalRead(IR2)==LOW & digitalRead(IR1)==LOW & digitalRead(IR3)==LOW){ 
+        move_forward(200,100);
+        Brake(100);}
+  }
 
 
 void Rotate_right_until_match(){
@@ -258,22 +263,22 @@ void Rotate_left_until_match(){
 }
 void color_path(){
     if (color_hold==1){
-      move_forward(200,1200);
+      move_forward(200,2400);
       Brake(100);
-        Rotate_left_inplace(200,1900);
+        Rotate_left_inplace(200,2600);
         Brake(100);
-        move_forward(200,2000);
+        move_forward(200,2800);
         Brake(100);
     };
     if (color_hold==0){
-      move_forward(200,1200);
+      move_forward(200,2100);
       Brake(100);
-        Rotate_right_inplace(200,1900);
+        Rotate_right_inplace(200,1700);
         Brake(100);
-        move_forward(200,2000);
+        move_forward(200,2100);
         Brake(100);
     };
-}
+} 
 void loop() 
 
 { 
@@ -284,6 +289,7 @@ open_arm(10,3,110);
       close_arm(110,3);
       
       delay(800);
+      search_line();
 
   
   while(task == 0){
@@ -293,7 +299,7 @@ open_arm(10,3,110);
     
     
     Serial.println("loop");
-    Brake(60);
+    Brake(50);
     digitalWrite(moving_led,LOW);
 
    if(digitalRead(IR1) == LOW  && digitalRead(IR2)==HIGH && digitalRead(IR3)==LOW) //IR will not glow on black line
@@ -336,7 +342,7 @@ open_arm(10,3,110);
 
   else if(digitalRead(IR1) == LOW && digitalRead(IR2) == LOW  && digitalRead(IR3) == LOW)
   { 
-    move_forward(230,1500);
+    move_forward(220,1500);
 
   line_recovery();
  
@@ -350,7 +356,7 @@ else if(digitalRead(IR1) == HIGH && digitalRead(IR2) == HIGH  && digitalRead(IR3
 //  move_forward(200,2500);
 //     Brake(300);
 //      color_path();
-//      move_forward(220,2100);
+//      move_forward(220,2500);
 //      Brake(500);
   if (distance <=55 && load_carrying == 0){
       sweep();
@@ -364,7 +370,7 @@ else if(digitalRead(IR1) == HIGH && digitalRead(IR2) == HIGH  && digitalRead(IR3
       
       delay(800);
       
-      Rotate_left_inplace(220,3500);
+      Rotate_left_inplace(220,3200);
       load_carrying = 1;
       task = 1;
        Distance_sensor();}
@@ -434,16 +440,16 @@ while(task==1){
     
 }
 else if(digitalRead(IR1) == HIGH && digitalRead(IR2) == HIGH  && digitalRead(IR3) == HIGH){
-//  move_forward(220,50);
+
   Distance_sensor();
-//  delay(3500);
-//  move_forward(200,2500);
-//     Brake(300);
-//      color_path();
-//      move_forward(220,2100);
-//      Brake(500);
-  if (distance <=105 && load_carrying == 1 && distance>=80){
+
+  if (distance <=105 && distance>=60){
       color_path();
+      open_arm(30,3,120);
+      delay(1000);
+      move_backward(200,2500);
+      task = 0;
+      load_carrying = 0;
        Distance_sensor();}
    else{
     Brake(50);
@@ -452,26 +458,4 @@ else if(digitalRead(IR1) == HIGH && digitalRead(IR2) == HIGH  && digitalRead(IR3
   }
       
 
-}
-}
-
-
-//calibrated 
-void color_path(){
-    if (color_hold==1){
-      move_forward(200,2400);
-      Brake(100);
-        Rotate_left_inplace(200,2600);
-        Brake(100);
-        move_forward(200,2800);
-        Brake(100);
-    };
-    if (color_hold==0){
-      move_forward(200,2100);
-      Brake(100);
-        Rotate_right_inplace(200,1700);
-        Brake(100);
-        move_forward(200,2100);
-        Brake(100);
-    };
-} 
+}}}
